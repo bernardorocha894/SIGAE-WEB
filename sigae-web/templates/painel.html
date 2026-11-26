@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "pecas.html" import risco, botoes %}
+{% block titulo %}Painel geral{% endblock %}
+{% block conteudo %}
+
+<div class="numeros">
+  {% for estado, total in s.contagem() %}<div>{{ estado }}<b>{{ total }}</b></div>{% endfor %}
+</div>
+
+<div class="caixa">
+  <h2>Próxima chamada</h2>
+  <div class="dentro proximo">
+    {% set p = s.fila.topo() %}
+    {% set m = s.livres.topo() %}
+    <div>Paciente mais urgente
+      {% if p %}<div class="grande">#{{ p.id }} {{ p.nome }}</div>{{ risco(p) }}{% else %}<div class="grande">Fila vazia</div>{% endif %}
+    </div>
+    <div>Médico que vai atender
+      {% if m %}<div class="grande">{{ m.nome }}</div>{{ m.concluidos }} concluído(s){% else %}<div class="grande">Nenhum livre</div>{% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="caixa">
+  <h2>Em atendimento agora</h2>
+  {% if s.em_atendimento() %}
+  <table>
+    <tr><th>Paciente</th><th>Risco</th><th>Médico</th><th>Início</th><th></th></tr>
+    {% for p in s.em_atendimento() %}
+    <tr><td><span class="id">#{{ p.id }}</span> {{ p.nome }}</td><td>{{ risco(p) }}</td><td>{{ p.medico.nome }}</td><td>{{ p.inicio }}</td><td>{{ botoes(p) }}</td></tr>
+    {% endfor %}
+  </table>
+  {% else %}<p class="vazio">Ninguém em atendimento.</p>{% endif %}
+</div>
+{% endblock %}

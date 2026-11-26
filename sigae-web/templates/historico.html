@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "pecas.html" import risco, situacao %}
+{% block titulo %}Histórico{% endblock %}
+{% block conteudo %}
+<div class="duas">
+  <div class="caixa">
+    <h2>Atendimentos concluídos por médico</h2>
+    <table>
+      {% for m in s.lista_medicos() %}<tr><td>{{ m.nome }}</td><td><b>{{ m.concluidos }}</b></td></tr>
+      {% else %}<tr><td class="vazio">Nenhum médico.</td></tr>{% endfor %}
+    </table>
+  </div>
+  <div class="caixa">
+    <h2>Pacientes por situação</h2>
+    <table>{% for estado, total in s.contagem() %}<tr><td>{{ situacao(estado) }}</td><td><b>{{ total }}</b></td></tr>{% endfor %}</table>
+  </div>
+</div>
+
+<div class="caixa">
+  <h2>Chegadas em ordem cronológica</h2>
+  <table>
+    <tr><th>Chegada</th><th>Paciente</th><th>Risco</th><th>Situação</th></tr>
+    {% for p in s.chegadas %}
+    <tr><td>{{ p.chegada }}</td><td><span class="id">#{{ p.id }}</span> {{ p.nome }}</td><td>{{ risco(p) }}</td><td>{{ situacao(p.situacao) }}</td></tr>
+    {% else %}<tr><td colspan="4" class="vazio">Sem chegadas.</td></tr>{% endfor %}
+  </table>
+</div>
+
+<div class="caixa">
+  <h2>Registro de eventos</h2>
+  <table>
+    {% for hora, texto in s.eventos|reverse %}<tr><td class="id">{{ hora }}</td><td>{{ texto }}</td></tr>
+    {% else %}<tr><td class="vazio">Nada registrado.</td></tr>{% endfor %}
+  </table>
+</div>
+{% endblock %}
