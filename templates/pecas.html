@@ -11,5 +11,8 @@
   {% if p.situacao in ['Aguardando', 'Em atendimento'] %}
     <form action="/pacientes/{{ p.id }}/cancelar" method="post"><button class="vermelho">Cancelar</button></form>
   {% endif %}
+  {% if p.situacao == 'Aguardando' %}
+    <form action="/pacientes/{{ p.id }}/excluir" method="post" onsubmit="return confirm('Excluir o cadastro de {{ p.nome }}?')"><button>Excluir</button></form>
+  {% endif %}
 </div>
 {% endmacro %}

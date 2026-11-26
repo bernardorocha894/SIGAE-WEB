@@ -158,6 +158,17 @@ class Sistema:
         p.situacao = "Cancelado"
         self.registrar(f"#{p.id} {p.nome} cancelado.")
 
+    def excluir(self, id):
+        # apaga um cadastro feito por engano (só de quem ainda está aguardando)
+        p = self.buscar_paciente(id)
+        if p.situacao != "Aguardando":
+            raise ErroSIGAE("Só dá para excluir quem ainda está aguardando.")
+        self.fila.remover(p.id)              # sai do Heap
+        self.arvore.remover(p.chave())       # sai da Rubro-Negra
+        self.pacientes.remover_item(p.id)    # sai da Tabela Hash
+        self.chegadas.remove(p)
+        self.registrar(f"Cadastro de #{p.id} {p.nome} excluído.")
+
     def liberar(self, medico):
         medico.situacao = "Disponível"
         medico.paciente = None

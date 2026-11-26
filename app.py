@@ -111,6 +111,11 @@ def cancelar(id):
     return fazer(sistema.cancelar, id, ok="Paciente cancelado.")
 
 
+@app.post("/pacientes/<int:id>/excluir")
+def excluir(id):
+    return fazer(sistema.excluir, id, ok="Cadastro excluído.")
+
+
 @app.post("/reiniciar")
 def reiniciar():
     global sistema
