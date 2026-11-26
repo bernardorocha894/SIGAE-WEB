@@ -148,6 +148,14 @@ class TestCenarios(unittest.TestCase):
         self.assertEqual(a.situacao, "Disponível")
         self.assertEqual(len(s.livres), 3)    # médico voltou para o heap
 
+    def test_excluir_tira_de_todas_as_estruturas(self):
+        s = Sistema()
+        p = s.cadastrar_paciente("Cadastro errado", 3)
+        s.excluir(p.id)
+        self.assertIsNone(s.pacientes.obter_item(p.id))   # saiu da Hash
+        self.assertEqual(len(s.fila), 0)                  # saiu do Heap
+        self.assertEqual(len(s.arvore), 0)                # saiu da Árvore
+
     def test_hash_e_arvore_dentro_do_sistema(self):
         s = Sistema()
         for i in range(30):
