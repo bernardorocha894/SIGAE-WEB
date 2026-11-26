@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% from "pecas.html" import risco %}
+{% block titulo %}Árvore Rubro-Negra{% endblock %}
+{% block conteudo %}
+<p class="dica">Pacientes que estão aguardando, organizados por horário de chegada. Quem chegou antes fica mais à esquerda.
+Clique em um paciente para ver como a árvore o encontra.</p>
+
+<div class="lado" style="grid-template-columns: minmax(0, 1fr) 300px">
+  <div class="caixa">
+    <h2>{{ s.arvore|length }} paciente(s) na árvore <small>altura {{ s.arvore.altura() }}, {{ s.arvore.rotacoes }} rotação(ões) até agora</small></h2>
+    {% if nos %}
+    {% set largura = nos|length * 64 + 60 %}
+    {% set altura = s.arvore.altura() * 80 + 20 %}
+    <div class="desenho">
+      <svg width="{{ largura }}" height="{{ altura }}">
+        {# primeiro as linhas, depois as bolinhas por cima #}
+        {% for n in nos if n.pai_coluna is not none %}
+          {% set no_caminho = n.no.chave in caminho and n.pai.chave in caminho %}
+          <line class="aresta {{ 'caminho' if no_caminho }}"
+                x1="{{ 62 + n.pai_coluna * 64 }}" y1="{{ 40 + n.pai_nivel * 80 }}"
+                x2="{{ 62 + n.coluna * 64 }}" y2="{{ 40 + n.nivel * 80 }}"/>
+        {% endfor %}
+        {% for n in nos %}
+          {% set x = 62 + n.coluna * 64 %}{% set y = 40 + n.nivel * 80 %}
+          <a href="/arvore?p={{ n.no.valor.id }}" class="no {{ n.no.cor }}">
+            <title>#{{ n.no.valor.id }} {{ n.no.valor.nome }}, chegou {{ n.no.valor.chegada }}</title>
+            {% if n.no.chave in caminho %}<circle class="marcado" cx="{{ x }}" cy="{{ y }}" r="28"/>{% endif %}
+            <circle cx="{{ x }}" cy="{{ y }}" r="22"/>
+            <text x="{{ x }}" y="{{ y }}">#{{ n.no.valor.id }}</text>
+          </a>
+        {% endfor %}
+      </svg>
+    </div>
+    <div class="dentro legenda">
+      <span><i class="bola V"></i>nó vermelho</span>
+      <span><i class="bola P"></i>nó preto</span>
+      <span>Escolher:
+        <select onchange="location='/arvore?p='+this.value" style="display:inline-block;width:auto;margin:0">
+          <option value="">paciente...</option>
+          {% for p in s.arvore.em_ordem() %}<option value="{{ p.id }}" {{ 'selected' if selecionado and selecionado.id == p.id }}>#{{ p.id }} {{ p.nome }} ({{ p.chegada }})</option>{% endfor %}
+        </select>
+      </span>
+    </div>
+    {% else %}
+      <p class="vazio">A árvore está vazia. Cadastre pacientes na tela Pacientes.</p>
+    {% endif %}
+  </div>
+
+  <div>
+    <div class="caixa">
+      <h2>Busca na árvore</h2>
+      <div class="dentro">
+        {% if selecionado and caminho %}
+          <p><b>#{{ selecionado.id }} {{ selecionado.nome }}</b> {{ risco(selecionado) }}<br>Chave: ({{ selecionado.chegada }}, {{ selecionado.id }})</p>
+          <p class="caminho-txt">{% for c in caminho %}#{{ c[1] }}{{ ' → ' if not loop.last }}{% endfor %}</p>
+          <p class="dica" style="margin:0">{{ caminho|length }} comparação(ões). Em cada nó: chegou antes, vai para a esquerda; chegou depois, vai para a direita.</p>
+        {% elif selecionado %}
+          <p class="dica" style="margin:0">#{{ selecionado.id }} {{ selecionado.nome }} não está mais na árvore: ele já foi chamado ou cancelado.</p>
+        {% else %}
+          <p class="dica" style="margin:0">Clique em um paciente no desenho.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="caixa">
+      <h2>Regras {{ '✓' if s.arvore.valida() else '✗' }}</h2>
+      <ol class="dentro regras">
+        <li>Todo nó é vermelho ou preto.</li>
+        <li>A raiz é preta.</li>
+        <li>Folhas vazias (NIL) são pretas.</li>
+        <li>Vermelho não tem filho vermelho.</li>
+        <li>Todo caminho tem a mesma quantidade de pretos.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+{% endblock %}
