@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "pecas.html" import risco, situacao, botoes %}
+{% block titulo %}Atendimentos{% endblock %}
+{% block conteudo %}
+<div class="caixa">
+  <h2>Em andamento</h2>
+  {% if s.em_atendimento() %}
+  <table>
+    <tr><th>Paciente</th><th>Risco</th><th>Médico</th><th>Início</th><th></th></tr>
+    {% for p in s.em_atendimento() %}
+    <tr><td><span class="id">#{{ p.id }}</span> {{ p.nome }}</td><td>{{ risco(p) }}</td><td>{{ p.medico.nome }}</td><td>{{ p.inicio }}</td><td>{{ botoes(p) }}</td></tr>
+    {% endfor %}
+  </table>
+  {% else %}<p class="vazio">Nenhum atendimento em andamento.</p>{% endif %}
+</div>
+
+<div class="caixa">
+  <h2>Finalizados</h2>
+  <table>
+    <tr><th>Paciente</th><th>Médico</th><th>Início</th><th>Fim</th><th>Situação</th></tr>
+    {% for p in s.chegadas if p.situacao in ['Concluído', 'Cancelado'] and p.medico %}
+    <tr><td><span class="id">#{{ p.id }}</span> {{ p.nome }}</td><td>{{ p.medico.nome }}</td><td>{{ p.inicio }}</td><td>{{ p.fim }}</td><td>{{ situacao(p.situacao) }}</td></tr>
+    {% else %}<tr><td colspan="5" class="vazio">Nenhum atendimento finalizado.</td></tr>{% endfor %}
+  </table>
+</div>
+{% endblock %}
