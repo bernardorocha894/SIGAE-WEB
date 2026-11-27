@@ -18,11 +18,16 @@
     </div>
 
     <div class="caixa">
-      <h2>Buscar pelo ID <small>Tabela Hash</small></h2>
+      <h2>Buscar paciente <small>pelo ID ou pelo nome</small></h2>
       <div class="dentro">
-        <form class="linha"><input name="id" type="number" min="1" value="{{ busca }}" placeholder="ID"><button>Buscar</button></form>
-        {% if achado %}
-          <p><b>#{{ achado.id }} {{ achado.nome }}</b><br>{{ risco(achado) }} {{ situacao(achado.situacao) }}<br>Chegou às {{ achado.chegada }}</p>
+        <form class="linha"><input name="busca" value="{{ busca }}" placeholder="Ex.: 12 ou Maria"><button>Buscar</button></form>
+        {% if achados is not none %}
+          {% for p in achados %}
+            <p style="margin:12px 0 0"><b>#{{ p.id }} {{ p.nome }}</b><br>{{ risco(p) }} {{ situacao(p.situacao) }}<br>Chegou às {{ p.chegada }}{{ ', médico: ' ~ p.medico.nome if p.medico }}</p>
+          {% else %}
+            <p class="msg erro" style="margin:12px 0 0">Nenhum paciente encontrado para "{{ busca }}".</p>
+          {% endfor %}
+          <p style="margin:10px 0 0"><a href="/pacientes">Limpar busca</a></p>
         {% endif %}
         <p class="dica" style="margin:12px 0 0">Tabela com {{ s.pacientes.tamanho }} posições, {{ s.pacientes.colisoes }} colisão(ões), {{ s.pacientes.redimensionamentos }} redimensionamento(s).</p>
       </div>

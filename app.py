@@ -35,13 +35,9 @@ def painel():
 
 @app.route("/pacientes")
 def pacientes():
-    achado = None
-    busca = request.args.get("id", "")
-    if busca:
-        achado = sistema.pacientes.obter_item(int(busca))     # busca na Tabela Hash
-        if achado is None:
-            flash(f"Paciente #{busca} não encontrado.", "erro")
-    return render_template("pacientes.html", pagina="pacientes", achado=achado, busca=busca)
+    busca = request.args.get("busca", "").strip()
+    achados = sistema.buscar_pacientes(busca) if busca else None   # ID: Tabela Hash; nome: lista
+    return render_template("pacientes.html", pagina="pacientes", achados=achados, busca=busca)
 
 
 @app.route("/triagem")
@@ -51,7 +47,10 @@ def triagem():
 
 @app.route("/medicos")
 def medicos():
-    return render_template("medicos.html", pagina="medicos")
+    busca = request.args.get("busca", "").strip()
+    filtro = request.args.get("situacao", "")
+    lista = sistema.buscar_medicos(busca, filtro)
+    return render_template("medicos.html", pagina="medicos", lista=lista, busca=busca, filtro=filtro)
 
 
 @app.route("/atendimentos")

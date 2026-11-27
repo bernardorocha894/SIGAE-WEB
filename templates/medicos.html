@@ -15,15 +15,26 @@
   <div class="caixa">
     <h2>Equipe <small>o próximo é o livre com menos atendimentos concluídos</small></h2>
     {% set proximo = s.livres.topo() %}
-    {% if s.lista_medicos() %}
+    <form class="dentro linha" style="border-bottom:1px solid var(--linha)">
+      <input name="busca" value="{{ busca }}" placeholder="Buscar por ID ou nome">
+      <select name="situacao" style="margin:0;width:auto">
+        <option value="">Todos</option>
+        <option value="Disponível" {{ 'selected' if filtro == 'Disponível' }}>Disponíveis</option>
+        <option value="Em atendimento" {{ 'selected' if filtro == 'Em atendimento' }}>Em atendimento</option>
+      </select>
+      <button>Filtrar</button>
+      {% if busca or filtro %}<a href="/medicos" style="align-self:center;white-space:nowrap">Limpar</a>{% endif %}
+    </form>
+    {% if lista %}
     <table>
       <tr><th>Médico</th><th>Registro</th><th>Situação</th><th>Concluídos</th><th>Atendendo</th></tr>
-      {% for m in s.lista_medicos() %}
+      {% for m in lista %}
       <tr><td><span class="id">#{{ m.id }}</span> <b>{{ m.nome }}</b>{{ ' (próximo)' if proximo and proximo.id == m.id }}</td>
           <td>{{ m.crm }}</td><td>{{ situacao(m.situacao) }}</td><td><b>{{ m.concluidos }}</b></td>
           <td>{{ m.paciente.nome if m.paciente else '' }}</td></tr>
       {% endfor %}
     </table>
+    {% elif busca or filtro %}<p class="vazio">Nenhum médico encontrado com esse filtro.</p>
     {% else %}<p class="vazio">Nenhum médico cadastrado.</p>{% endif %}
   </div>
 </div>
