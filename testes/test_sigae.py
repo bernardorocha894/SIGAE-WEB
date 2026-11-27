@@ -156,6 +156,23 @@ class TestCenarios(unittest.TestCase):
         self.assertEqual(len(s.fila), 0)                  # saiu do Heap
         self.assertEqual(len(s.arvore), 0)                # saiu da Árvore
 
+    def test_buscar_paciente_por_id_e_por_nome(self):
+        s = Sistema()
+        s.cadastrar_paciente("Maria Souza", 3)
+        s.cadastrar_paciente("João Silva", 2)
+        s.cadastrar_paciente("Mariana Lima", 1)
+        self.assertEqual([p.nome for p in s.buscar_pacientes("2")], ["João Silva"])   # pelo ID (Hash)
+        self.assertEqual(len(s.buscar_pacientes("mari")), 2)                         # pelo nome
+        self.assertEqual(s.buscar_pacientes("Pedro"), [])
+
+    def test_filtrar_medicos_por_situacao(self):
+        s = com_tres_medicos()
+        s.cadastrar_paciente("P1", 3)
+        s.chamar_proximo()                                    # A fica em atendimento
+        self.assertEqual([m.nome for m in s.buscar_medicos("", "Disponível")], ["B", "C"])
+        self.assertEqual([m.nome for m in s.buscar_medicos("", "Em atendimento")], ["A"])
+        self.assertEqual([m.nome for m in s.buscar_medicos("2")], ["B"])              # pelo ID (Hash)
+
     def test_hash_e_arvore_dentro_do_sistema(self):
         s = Sistema()
         for i in range(30):

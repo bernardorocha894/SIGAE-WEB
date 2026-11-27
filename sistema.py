@@ -176,6 +176,27 @@ class Sistema:
 
     # ---------------- consultas para as telas ----------------
 
+    def buscar_pacientes(self, texto):
+        # número: busca direto na Tabela Hash; nome: procura quem tem esse trecho no nome
+        texto = (texto or "").strip()
+        if texto.isdigit():
+            p = self.pacientes.obter_item(int(texto))
+            return [p] if p else []
+        texto = texto.lower()
+        return [p for p in self.chegadas if texto in p.nome.lower()]
+
+    def buscar_medicos(self, texto="", situacao=""):
+        # filtra por ID (Tabela Hash de médicos) ou nome, e pela situação
+        texto = (texto or "").strip()
+        if texto.isdigit():
+            m = self.medicos.obter_item(int(texto))
+            medicos = [m] if m else []
+        else:
+            medicos = [m for m in self.lista_medicos() if texto.lower() in m.nome.lower()]
+        if situacao:
+            medicos = [m for m in medicos if m.situacao == situacao]
+        return medicos
+
     def lista_medicos(self):
         medicos = self.medicos.valores()
         medicos.sort(key=lambda m: m.id)
